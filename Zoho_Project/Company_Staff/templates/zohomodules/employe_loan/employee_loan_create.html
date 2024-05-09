@@ -1,0 +1,1566 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<style>
+    label{
+        color: white;
+    }
+
+.emp{
+    background-color: white;
+}
+</style>
+<style>         /* SEARCH STYLE */
+    /* Style the Select2 search input */
+    .select2-search__field {
+      width: 100%; /* Set the width as needed */
+      padding: 8px; /* Adjust padding as needed */
+      border: 1px solid #92acc6; /* Add border color */
+      border-radius: 5px; /* Add border-radius for rounded corners */
+      outline: none; /* Remove the outline */
+      color: #000;
+    }
+  /*   
+    .select2-container .select2-selection--single{box-sizing:border-box;cursor:pointer;display:block;height:35px;user-select:none;color: black;
+      -webkit-user-select:none;background-color: #fff;} */
+  .select2-container .select2-selection--single .select2-selection__rendered{border: 1px solid white; border-radius: 6px; display:block;padding-left:20px;padding-right:20px; height: 35px;color: #000000;background-color:  rgb(252, 252, 252);border-radius: 5px;box-shadow: #fcfcfc;border-color: #f2e8e8;}
+      .select2-dropdown{background-color:rgb(0, 0, 0);color: rgb(253, 253, 253);position:absolute;left:-100000px;width:100%;z-index:1051;color: rgb(255, 255, 255);border-color: #f2e8e8;}
+      .select2-results{display:block;border: #ced4da;border-color: #f2e8e8;}
+      .select2-results__options{list-style:none;margin:0;padding:0;color: rgb(255, 255, 255);background-color: #030303;padding-left: 20px;border-color: #f2e8e8;} 
+      .select2-results__option[aria-selected]{cursor:pointer;color: rgb(251, 251, 251);background-color: #0c0c0c;border-color: #f2e8e8;}
+      .select2-container--open .select2-dropdown{left:0;color: rgb(255, 255, 255);background-color: #000000;border-color: #f2e8e8;}
+  
+      .select2-hidden-accessible{background-color: #000000;border:2px !important;clip:rect(0 0 0 0) !important;-webkit-clip-path:inset(50%) !important;clip-path:inset(50%) !important;height:0px !important;padding:0 !important;position:absolute !important;width:1px !important;white-space:nowrap !important;color: rgb(250, 250, 250)} 
+      /* .select2-container--default .select2-selection--single{background-color:#000000;border:1px solid #000000;border-radius:4px;color: rgb(0, 0, 0);background-color: #ede4e4;} */
+  /* .select2-hidden-accessible{background-color: #fff;border:0 !important;clip:rect(0 0 0 0) !important;-webkit-clip-path:inset(50%) !important;clip-path:inset(50%) !important;height:1px !important;overflow:hidden !important;padding:0 !important;position:absolute !important;width:1px !important;white-space:nowrap !important;color: black}  */
+  .select2-container--default .select2-selection--single:focus, .select2-container--default .select2-selection--single .select2-search__field:focus, .typeahead:focus, .tt-query:focus, .tt-hint:focus {
+      border: 1px solid rgba(250, 250, 250, 0.5);
+      background-color: #d3bcbc;
+  }
+  </style>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                 <li class="breadcrumb-item"><a href="{% url 'employee_listpage' %}" class="text-warning-emphasis">Employee loan</a></li>
+                 <li class="breadcrumb-item" aria-current="page">Create employee loan</li>
+        </nav>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1200px;">
+                  <div class="row mt-4">
+        <section>
+            <div class="container pl-5" style="color:white;">
+                <div class="header pb-5">
+                    <h2 style="text-align: center;color:white;"> EMPLOYEE NEW LOAN </h2>
+                    <hr class="text-warning font-weight-bold">
+                    {% for message in messages %}
+                    <h5>
+                        <div class="alert alert-danger message">
+                            {{ message }}
+                        </div>
+                    </h5>
+                    {% endfor %}
+                </div>
+                <form method="POST" action="{%url 'addemployeloan' %}" enctype="multipart/form-data" id="myForm" >
+                    {% csrf_token %}
+                    <div class="row mt-3">
+                       
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Employee</label>
+                            <div class="d-flex">
+                                <select  name="employee" id="empl_id" class="form-control emp" style="width: 95%; color: black;" required>
+                                    <option value="NIL" >Select Employee</option>
+                                    {% for cust in pay %}
+                                   
+                                    <option value="{{ cust.id }} ">{{ cust.title }} {{ cust.first_name }} 
+                                        {{ cust.last_name }}</option>
+                                   
+                                    {% endfor %}
+                                </select>
+                                <script>
+                                    $(document).ready(function() {
+                                      // Initialize select2
+                                      $('#empl_id').select2();
+                                    });
+                                    </script>                        
+                                     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script>
+
+                                <a class="btn btn-warning ml-1 " role="button" data-toggle="modal" data-target="#employeeModal">+</a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5 ml-5">
+                            <label class="col-form-label text-light">Employee Id</label>
+                            <input type="text" class="form-control bg-light" id="eid" name="employeeno"
+                                placeholder="Employee Id" required style="color: black;">
+                        </div>
+    
+    
+    
+                    </div>
+    
+                    <div class="row mt-3">
+                        <div class="col-md-5 ml-5 " >
+                            <label class="col-form-label text-light">Email</label>
+                            <input type="text" class="form-control bg-light" id="email" name="email" placeholder="Email" required style="color: black;" >
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Salary</label>
+                            <input type="number" class="form-control bg-light" id="Salary" name="Salary" placeholder="Salary" required style="color: black;">
+                        </div>
+    
+    
+                        <div class="col-md-5 ml-4">
+    
+                            <label class="col-form-label text-light">Joining Date</label>
+                            <input type="date" class="form-control bg-light"  id="joindate" name="joindate" required style="color: black;"><br>
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Loan Date</label>
+                            <input type="date" class="form-control bg-light" value="{{ tod }}" id="loandate" name="loandate" required style="color: black;"><br>
+                        </div>
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Loan Amount</label>
+                            <input type="text" class="form-control bg-light" id="Loan_Amount" name="Loan_Amount"
+                                placeholder="Loan Amound" required style="color: black;"><br>
+                                
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Expiry Date</label>
+    
+                            <input type="date" class="form-control bg-light" id="experydate" name="experydate" required style="color: black;"><br>
+                        </div>
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Loan Duration</label>
+                            <div class="d-flex">
+                                <select class="form-control term bg-light" name="loan_duration" id="loan_duration" onchange="updateExpDate()" required style="color: black;">
+                                    <option value="" selected hidden>Choose duration</option>
+                                    <option value="3 Months">3 Months</option>
+                                   
+                                    <option value="6 Months">6 Months</option>
+                                    <option value="1 Year">1 Year</option>
+                                    {% for d in dur %}
+                                <option value="{{d.day}} {{d.duration}}">{{d.day}} {{d.duration}}</option>
+                                {% endfor %}
+                                </select>
+                            <a class="btn btn-warning ml-1" role="button" data-target="#newduration"
+                                        data-toggle="modal">+</a>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 ml-4">
+                            <label class="col-form-label text-light">Payment Type</label>
+                            <select class="form-control my-select bg-light" id="pay_method" name="payment_method"  required style="color: black;">
+                                <option value="" selected hidden>Choose Payment</option>
+                                <option value="cash">Cash</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="upi">UPI</option>
+                                {% for i in bank %}
+                                <option value="{{i.bnk_name}}">{{i.bnk_name}} (...{{ i.last_digit}})</option>
+                              {% endfor %}
+                              </select>
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5" style="display:none;"  id="chequediv">
+                            <label class="col-form-label text-light" >Cheque No</label>
+                            <input type="text" class="form-control bg-light" name="cheque_id"  id="cheque_id" placeholder="Enter Cheque No" style="color: black;">
+                        </div>
+                     
+                        <div class="col-md-5 "  style="display:none; " id="upidiv">
+                            <label class="col-form-label text-light" >UPI ID</label>
+                            <input type="text" class="form-control bg-light" name="upi_id"  id="upi_id" placeholder="Enter UPI ID" style="color: black;">
+                        </div>
+                       
+                        <div class="col-md-5"  style="display:none;" id="bnkdiv">
+                            <label class="col-form-label text-light" >Bank Account</label>
+                            <input type="text" class="form-control bg-light" name="bnk_id" id="bnk_id"  style="background-color: #43596c;" readonly style="color: black;">
+                        </div>
+                    </div>
+                    <div class="col md-4 ml-5 pt-4">
+                        <label><b class="">Monthly Cutting :</b></label>&nbsp;&nbsp;
+                    
+                        <div class="form-check form-check-inline ml-3">
+                            <input class="form-check-input" type="radio" id="no" name="cutingamount" onchange="show3(this.value)" value="No" required style="color: black;">
+                            <label class="form-check-label text-light">In Amount</label>
+                        </div>
+                    
+                        <div class="form-check form-check-inline ml-3">
+                            <input class="form-check-input" type="radio" id="yes" name="cutingamount" onchange="show4(this.value)" value="Yes" required style="color: black;">
+                            <label class="form-check-label text-light">In Percentage</label>
+                        </div>
+                    </div>
+                    
+                        <!-- <div class="row"> -->
+                            <div class="desc m-4 ml-5 pt-4" id="cuttingPercentage" style="display: none;">
+                                <div class="card-title mt-3">
+                                    <h5 class="mb-0 text-light">Monthly Cutting in Percentage</h5>
+                                </div>
+                                <hr>
+                                <div class="row mt-3">
+                                    <div class="col-3 col-md-4">
+                                        <label class="col-form-label text-light ">Monthly Cutting (%)</label>
+                                        <input type="number" oninput="convert()" class="form-control bg-light" id="cu" name="cuttingPercentage"
+                                         placeholder="In Percentage"style="background-color: #2f516f; color: black;" min="0" value="0" required>
+                                    </div>     
+                                    <div class="col-3 col-md-4">
+                                        
+                                        <label class="col-form-label text-light">Amount</label>
+                                        <input type="number"  class="form-control bg-light" id="cp" name="cp"
+                                            placeholder="amount"style="background-color: #2f516f; color: black; width:50%;"  min="0" value="0" readonly required>    
+                                        
+                                         <!-- <span >Rs:</span>
+                                        <b><span id="cp">Amount</span></b> -->
+                                       
+                                        
+                                        <div id="messag"></div>
+    
+                                    </div>
+                                </div>        
+                            </div>
+                        <!-- </div> -->
+                        <div class="desc m-4 ml-5 pt-4" id="Cutingamount" style="display: none;">
+                            <div class="card-title mt-3">
+                                <h5 class="mb-0 text-light">Monthly Cutting in Amount</h5>
+                            </div>
+                            <hr>
+                            <div class="row mt-3">
+                                <div class="col-3 col-md-4">
+                                    <label class="col-form-label text-light">Monthly Cutting (INR)</label>
+    
+                                    <input type="number" oninput="validatecutamount()" class="form-control bg-light" id="amount" name="Cutingamount"
+                                        placeholder="In Amount"  min="0"  required style="color: black;"><br>
+                                    <div class="text-danger m-2" id="effectivefrom"></div>
+                                    <div id="message"></div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                       
+                    </div>    
+                        <div class="row clearfix" style="margin-top:20px">
+                            <div class="col-md-6 ml-4">
+                                <textarea class="form-control text-light" id="" name="Note" placeholder="Note"
+                                    style="height: 190px;"></textarea>
+                                <input type="file" name="file" style="margin-top: 10px; width: 70%; background-color: white;">
+                            </div>
+                        </div>
+                        <hr class="text-warning font-weight-bold">
+                        <div class="row">
+                            <div class="col-md-2 mt-3"></div>
+                            <div class="col-md-2 mt-3"></div>
+                            <div class="row-md-3 mt-3">
+                                <div class="col-md-3"></div>
+                                <center><button type="submit" class="btn btn-warning" style="width: 150px; font-size: medium; margin-left:60%;">
+                                    ADD
+                                </button>
+                                <button type="reset"  class="btn btn-warning" style=" width: 150px; font-size: medium;">
+                                   Cancel
+                                </button>
+                                
+                            </center> 
+                            </div>
+                            <div class="col-md-2 mt-3"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+    </form>
+
+
+<!-- Modal for Employee Form -->
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-xl" role="document" >
+        <div class="modal-content " style="background-color:rgb(32, 35, 37); ">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeModalLabel"></h5>
+                <button type="button" class="btn   float-right" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+                <div class="card radius-15" style="background-color: black ;margin-right:5% ; margin-left: 5%;">
+                    <div class="modal-body">
+             
+                        <div class="header pb-5">
+                            <h2 style="text-align: center;color:white;" id="employeeModalLabel">CREATE EMPLOYEE</h2>
+                            <hr class="text-warning font-weight-bold">
+                          
+                        </div>
+                <div class="container pl-5" style="color:white;">
+                <form method="POST" action="" enctype="multipart/form-data" id="myForms">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="data   col-md-6 ">
+                            <div class="row pb-3">   <!-- Your entire form code goes here -->
+                                <div class="col-6">
+                                    <label for="">Title</label>
+                                </div>
+                                <div class=" col-6">
+                                    <select class="form-control text-dark bg-light" name="title" id="title" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Mr">Mr</option>
+                                        <option value="Mrs">Mrs</option>
+                                        <option value="Miss">Miss</option>
+                                        <option value="Ms">Ms</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">First Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fname" id="fname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Last Name</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="lname" id="lname" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Alias</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="alias" id="alias">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of joining</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="date" class="form-control text-dark bg-light" name="joindate2" id="joindate2" required>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="sdate">Salary Date</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <select class="form-control text-dark bg-light" name="salary" id="sdate" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1-10">1-10</option>
+                                        <option value="11-15">11-15</option>
+                                        <option value="16-31">16-31</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Define salary details</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="saltype" id="sal" onchange="salFunction()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Fixed">Fixed</option>
+                                        <option value="Temporary">Temporary</option>
+                                        <option value="Variable">Time Based</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="fixed" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="fsalary" id="fsalary" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="variable" style="display: none;">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Amount per Hour</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="amnthr" id="amnthr" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Total working Hours</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="hours" id="hours" onkeyup="calculateAmount()" value="0">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Salary Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control text-dark bg-light" name="vsalary" id="vsalary" value="0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="image col-6 col-lg-6 col-md-6 col-sm-5">
+                            <div class="row">
+                                <div class="col-5 col-lg-5 col-md-10 col-sm-5 text-center">
+                                    <label for="">Upload Image</label>
+                                </div>
+                                <div class="col-6 col-lg-7 col-md-10 col-sm-5">
+                                    <br><br><br><br>
+                                    <label for="image-input">
+                                        <img class="img-fluid" src="" alt="profile image" id="img"
+                                            style="background-color: rgba(156, 156, 156, 0.267); border-radius: 30px;">
+                                    </label>
+                                    <input id="image-input" type="file" name="file" class="form-control" accept="image/*" onchange="loadFile(event)" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="gen-info row pt-5">
+                       
+                            <h4 class="text-center py-2 text-light">General information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class="left col-lg-6 col-sm-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Employee Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="empnum" id="empnum" onkeyup="empValidation(document.getElementById('empnum'))" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Designation</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="designation" required  id="designation">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Location</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="location" required id="location">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Gender</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="gender" id="dropId3" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female" >Female</option>
+                                        <option value="Transgender" >Transgender</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Date of Birth</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control text-dark bg-light"  id="dob" name="dob" onchange="calculateAge()" required >
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Age</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type=""  class="form-control text-dark bg-light"  id="age" name="age" readonly>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Blood Group</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" id="blood" name="blood" required>
+                                        <!-- <option value="A+">A+</option>
+                                        <option value="B+">B+</option> -->
+                                     
+                                        {% for i in blood %}
+                                        <option value="{{i.Blood_group}}" >{{i.Blood_group}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <a class="btn-outline-warning"  data-toggle="modal" data-target="#commentModal" data-toggle="tooltip" title="comment">
+                                        Add Blood group
+                                       </a>
+                                </div>
+                                
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Father's Name/Mother's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="fm_name" id="fm_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Spouse's Name</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="s_name" id="s_name">
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="phone" id="phone" required 
+                                        onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
+                                    <div id="pherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Emergency Contact Number</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control text-dark bg-light" name="ephone" id="ephone"
+                                        onkeyup="phoneValidate(document.getElementById('ephone'),document.getElementById('epherror'))">
+                                    <div id="epherror" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Email</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="email"  class="form-control text-dark bg-light" name="email2" id="email2"
+                                        required onkeyup="emailvalidate()">
+                                    <div id="error" class="text-danger"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-5 col-sm-5">
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Permanent Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="paddress" id="padrs1" onkeyup="clearaddreass(this.id)" required value=""></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="paddress2" id="padrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Temporary Address</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="mx-2" type="checkbox" id="filladdress" name="filladdress">
+                                    <label style="font-size: .8rem;">Same as permanent address</label>
+                                    <textarea class="form-control text-dark bg-light mb-2 pt-0" name="address" id="adrs1" onkeyup="clearaddreass(this.id)"></textarea>
+                                    <textarea class="form-control text-dark bg-light pt-0" name="address2" id="adrs2" onkeyup="clearaddreass(this.id)"></textarea>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Attachments</label>
+                                </div>
+                                <div class="col-6">
+                                    <input class="form-control" id="file-upload" type="file" name="attach" style="background: transparent;">
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-6">
+                                    <label for="">Provide Bank Details</label>
+                                </div>
+                                <div class="col-6"><select class="form-control text-dark bg-light" name="bank" id="dropId"
+                                        onchange="bankdisplay()" required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="bank" id="bank" style="display: none;">
+                                <br>
+                                <br>
+                                <h4 class="text-center py-2 text-light">Bank information</h4>
+                                <hr class="text-warning font-weight-bold">
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Account Number</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text"  class="form-control text-dark bg-light" name="acc_no" id="acc_no" pattern="[0-9]{14}">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">IFSC</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="ifsc" id="ifsc">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Name of Bank</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="b_name" id="b_name">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Branch Name</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" value="" class="form-control text-dark bg-light" name="branch" id="branch">
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Transaction Type</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="ttype" id="ttype">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="ATM">ATM</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Check">Check</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                                
+
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">TDS Applicable</label>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-control text-dark bg-light" name="tds" id="tds" onchange="tdsFunction()"
+                                        required>
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="tds-div" style="display: none;">
+                                <br>
+                                <br>
+                                <h5 class="text-center py-1 text-light">For Banking</h5>
+                                <hr class="text-warning font-weight-bold">
+                                
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Percentage/Amount</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="form-control text-dark bg-light" name="pora" id="pora" onchange="tdsFunction2()">
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="Percentage">Percentage</option>
+                                            <option value="Amount">Amount</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="p" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Percentage</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="pcnt" id="pcnt">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="a" style="display: none;">
+                                    <div class="row pb-3">
+                                        <div class="col-6">
+                                            <label for="">Amount</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control text-dark bg-light" name="amnt" id="amnt" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <br>
+                        <br>
+                      
+
+                        </div>
+                        <br>
+                        <br>
+                        <div class="row">
+                            <h4 class="text-center py-2 text-light">Statutary information</h4>
+                            <hr class="text-warning font-weight-bold">
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Income Tax Number(PAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text" class="form-control text-dark bg-light" name="itn" id="itn" pattern="^[A-Z]{5}[0-9]{4}[A-Z]$" placeholder="ABCDE0051C"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Aadhar Number(*)</label>
+                                </div>
+                                <div class="col-6"><input type="text"class="form-control text-dark bg-light" name="an" id="an" requiredpattern="[0-9\s]{14}"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">Universal Account Number(UAN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="uan" id="uan" ></div>
+                            </div>
+                            </div>
+                            <div class=" col-sm-9 col-lg-6">
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PF Account Number (PFN)</label>
+                                </div>
+                                <div class="col-6"><input type="number"  class="form-control text-dark bg-light" name="pfn"  id="pfn"></div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col-6">
+                                    <label for="">PR Account Number (PRAN)</label>
+                                </div>
+                                <div class="col-6"><input type="text"  class="form-control text-dark bg-light" name="pran" id="pran" ></div>
+                            </div>
+                        </div>
+                        </div>
+        
+                    </div>
+                    <hr>
+                    <div class="action-button" style="margin-right:10% ;">
+                        <button class="btn  text-light" type="submit" style="background-color: chocolate; width: 150px; font-size: medium;" id="saveEmployee" onclick="validateform()">Add</button>
+                        <button class="btn text-light" type="reset" style=" background-color: chocolate; width: 150px; font-size: medium;" onclick="goToTop()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+           </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal of loan duration-->
+<div class="modal fade" id="newduration" style="margin-top: 7vh;">
+    <div class="modal-dialog ">
+        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="excelModalLabel">Add Loan Duration</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37);">
+                <div class="card" style="background-color: black">
+                    <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="durationform">
+                    {% csrf_token %}
+                        <div class="form-group mt-3" style="margin-left: 2vh;">
+                            <div class="row">
+                                <div class="col-md-3 mt-2">
+                                    <label for="lday" style="font-size: medium; color:white;">Enter Day </label> <br><br>
+                                </div>
+                                <div class="col-md-8" style="margin-left: 2vh;">
+                                    <input type="number" class="form-control text-dark bg-white" name="lday" id="lday">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mt-2">
+                                    <label for="ldur" style="font-size: medium;color: white; white-space: nowrap;">Enter Duration </label> <br><br>
+                                </div>
+                                <div class="col-md-8" style="margin-left: 2vh;">
+                                    <select class="form-control text-dark bg-white" name="ldur" id="ldur">
+                                        <option value="" selected hidden>Select</option>
+                                        <option value="Month">Month</option>
+                                        <option value="Year">Year</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn text-center pt-2 btn-outline-warning" data-dismiss="modal" id="durationsave">Submit</button>
+                            <button type="button" class="btn text-center pt-2 btn-outline-warning" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>  
+
+<!---modal of loan durationend-->
+
+<!--modal for blood-->
+<!--modal for blood-->
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 8vh;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background-color: #3b3b3b" >
+            <div class="modal-header">
+                <h3 class="modal-title text-light" id="exampleModalLabel">Add Blood group</h3>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                </button>
+            </div>
+            
+            <form action="" method="POST" enctype="multipart/form-data" id="blood1">
+                {% csrf_token %}
+                
+                <div class="modal-body">
+                    <input type="text" class="form-control text-light" name="blood" id="blood_form" title="Please enter uppercase letters" oninput="validateBloodInput()">
+                    <small class="text-danger" id="bloodValidationMsg"></small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-warning" onclick="validateAndUploadBlood()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+  <!--modal for blood end-->
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<!--payment method -->
+<script>
+    $(document).ready(function() {
+      $("#pay_method").change(function() {
+        var x=$('#pay_method').val();
+        if(x==='cash'){
+          $('#chequediv').hide()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+        }else if(x==='cheque'){
+          $('#chequediv').show()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('upi_id').value=null
+        }else if(x==='upi'){
+          $('#upidiv').show()
+          $('#bnkdiv').hide()
+          $('#chequediv').hide()
+          document.getElementById('cheque_id').value=null
+        }else{
+          $('#bnkdiv').show()
+          $('#chequediv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+
+          $.ajax({
+              type: "GET",
+              url: "{% url 'bankdata1' %}",
+              data: {
+                  id: x,
+              },
+              success: function (response) {
+                  data = response.bank
+                  document.getElementById('cheque_id').value=null
+                  document.getElementById('upi_id').value=null
+                  document.getElementById("bnk_id").value = data
+              }
+          });
+        }
+      });
+    });
+</script>
+
+<!--payment method end-->
+
+<!--monthly cutting-->
+
+<script>
+ 
+        function show4(str) {
+    var employeesElement = document.getElementById('Employees');
+    if (employeesElement && employeesElement.value !== 'Timebased') {
+        $('#amount').prop('readonly', false);
+            // const amount =document.getElementById('Loan_Amound');
+            // const cutpercentage =document.getElementById('cuttingPercentage');
+            // const cutamount=Math.floor((cutpercentage.value/100)*amount.value);
+            // document.getElementById('amount').value = cutamount;
+            
+        }
+        else {
+            $('#amount').prop('readonly', true);
+            
+        }
+        document.getElementById('Cutingamount').style.display = 'none';
+        document.getElementById('cuttingPercentage').style.display = 'block';
+    }
+    function show3(sign) {
+        document.getElementById('Cutingamount').style.display = 'block';
+        document.getElementById('cuttingPercentage').style.display = 'none';
+        
+
+    }
+</script>
+<script>
+function convert(){
+    let per = document.getElementById("cu");
+    let pervalue = per.value;
+    let salary = document.getElementById("Salary").value;
+    let sal = document.getElementById("Salary")
+    const amount =document.getElementById('Loan_Amound');
+    
+    const cutamount=Math.floor((per.value/100)*sal.value);
+    const messageElement = document.getElementById("messag"); 
+    console.log(pervalue)
+    console.log(salary)
+    console.log(cutamount)
+    
+    document.getElementById("cp").value=cutamount;
+    
+    if (cutamount<= salary){
+        document.getElementById("cp").innerText=cutamount;
+        document.getElementById("cp").style.border="4px solid green"
+        document.getElementById("cu").style.border="4px solid green"
+        messageElement.innerText = "Amount Eligible for Loan.";
+    }
+    else {
+        document.getElementById("cp").innerText=cutamount;
+        document.getElementById("cp").style.border="4px solid red"
+        document.getElementById("cu").style.border="4px solid red"
+        messageElement.innerText = "Amount cannot exceed the salary.";
+    }
+    
+    
+}
+
+function validatecutamount(){
+    const loamt = document.getElementById("amount").value;   
+    let salary = document.getElementById("Salary").value;   
+    const messageElement = document.getElementById("message"); 
+    if (Number(salary) >= loamt){
+        document.getElementById("amount").style.border="4px solid green";
+        messageElement.innerText = "Amount Eligible for Loan.";
+    }
+    else {
+        document.getElementById("amount").style.border="3px solid red";
+        messageElement.innerText = "Amount cannot exceed the salary.";
+    }
+
+}
+
+</script>
+<!-- monthly cutting end-->
+
+<!-- Expiry date showing -->
+<script>
+    document.getElementById('loandate').addEventListener('change', updateExpDate);
+    function updateExpDate() {
+        var selectedDate = new Date( document.getElementById('loandate').value);
+        var newdate = new Date(selectedDate);
+        var loandur = document.getElementById('loan_duration').value;
+        ldays = parseInt(loandur.split(' ')[0])
+        lduration = loandur.split(' ')[1]
+        if (lduration == 'Year' || lduration == 'Years'){
+            ldays = ldays * 365
+            newdate.setDate(selectedDate.getDate() + ldays);
+            var loandate = newdate.toISOString().split('T')[0];
+            document.getElementById('experydate').value = loandate;
+        }else{
+            ldays = ldays * 30
+            newdate.setDate(selectedDate.getDate() + ldays);
+            var loandate = newdate.toISOString().split('T')[0];
+            document.getElementById('experydate').value = loandate;       
+        }
+    }
+    $(document).on('change','#loan_duration', function(){
+        var selectedDate = new Date(document.getElementById('loandate').value);
+        if(isNaN(selectedDate)){
+            alert('Select an Loan Issue Date')
+            document.getElementById('loan_duration').value = ''
+        }
+    })
+</script>
+
+
+ <!-- expiry date end !-->
+
+ <!-- fetching datas of employee!-->
+
+ <script>
+    $(document).ready(function () {
+        var loanAlreadyTaken = false; // Set to false initially
+    
+        $("#empl_id").change(function () {
+            var emp = $(this).val();
+           
+            console.log(emp)
+    
+            $.ajax({
+                url: 'check_user_loan',
+                data: {
+                    'emp': emp
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.is_tak) {
+                        // Loan already taken
+                        alert("Loan already taken by the employee.");
+                        loanAlreadyTaken = true;
+                        clearEmployeeDetails(); // Clear employee details
+                    } else {
+                        // Loan not taken
+                        loanAlreadyTaken = false;
+                        fetchEmployeeDetails();
+                    }
+                }
+            });
+        });
+    
+        $('#empl_id').on('change', function () {
+            if (loanAlreadyTaken) {
+                // If loan already taken, fetch employee details
+                fetchEmployeeDetails();
+            }
+        });
+    
+        function fetchEmployeeDetails() {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'listemployee_loan' %}",
+                data: {
+                    id: $('#empl_id').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (data) {
+                   console.log("success");
+                    updateFormFields(data);
+                }
+            });
+        }
+    
+        function updateFormFields(data) {
+            console.log(data.email);
+            document.getElementById('email').value = data.email;
+            console.log(data.employeeno);
+            document.getElementById('eid').value = data.employeeno;
+            console.log(data.joindate);
+            document.getElementById('joindate').value = data.joindate;
+            console.log(data.amount);
+            document.getElementById('Salary').value = data.amount;
+        }
+    
+        function clearEmployeeDetails() {
+            // Clear employee details from the form fields
+            updateFormFields({
+                email: '',
+                employeeno: '',
+                joindate: '',
+                amount: ''
+            });
+        }
+    });
+    
+    </script>
+    <!-- end-->
+<!--Modal of employee saving -->
+<script>
+$(document).on("click", "#saveEmployee", function () {
+    console.log("adding")
+    $.ajax({
+        type: "POST",
+        url: "{% url 'createpayroll2' %}",
+        data: {
+            title: $("#title").val(),
+            fname: $("#fname").val(),
+            lname: $("#lname").val(),
+            alias: $("#alias").val(),
+            joindate: $("#joindate2").val(),
+            
+            salarydate: $("#sdate").val(),
+            saltype: $("#sal").val(),
+            fsalary: $("#fsalary").val(),
+            vsalary: $("#vsalary").val(),
+            amnts: $("#amnthr").val(),
+            file: $("#img").val(),
+            hours: $("#hours").val(),
+            empnum: $("#empnum").val(),
+            designation: $("#designation").val(),
+            location: $("#location").val(),
+            gender: $("#dropId3").val(),
+            dob: $("#dob").val(),
+            blood: $("#blood").val(),
+            fm_name: $("#fm_name").val(),
+            s_name: $("#s_name").val(),
+            paddress: $("#padrs1").val(),
+            paddress2: $("#padrs2").val(),
+            address: $("#adrs1").val(),
+            address2: $("#adrs2").val(),
+            filladdress: $("#filladdress").prop("checked"),
+            phone: $("#phone").val(),
+            ephone: $("#ephone").val(),
+            email2: $("#email2").val(),
+            attach: $("#file-upload").val(),
+            bank: $("#dropId").val(),
+            acc_no: $("#acc_no").val(),
+            ifsc: $("#ifsc").val(),
+            b_name: $("#b_name").val(),
+            branch: $("#branch").val(),
+            ttype: $("#ttype").val(),
+            tds: $("#tds").val(),
+            pora: $("#pora").val(),
+            pcnt: $("#pcnt").val(),
+            amnt: $("#amnt").val(),
+            itn: $("#itn").val(),
+            an: $("#an").val(),
+            uan: $("#uan").val(),
+            pfn: $("#pfn").val(),
+            pran: $("#pran").val(),
+            age: $("#age").val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        
+        success: function (response) {
+            console.log("added")
+            console.log(joindate)
+            document.getElementById("myForms").reset();
+            // reloadVendor();
+        },
+    });
+});
+</script>
+<!-- modal of employee saving end-->
+
+
+
+
+
+<script>
+    async function uploadBlood() {
+        const form = document.getElementById('blood1'); // Adjust the form ID if needed
+        const formData = new FormData(form);
+
+        var response = await fetch('add_blood', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            var result = await response.json();
+            console.log(result.message);
+            alert(result.message);
+            
+            // Reset the form and close the modal
+            document.getElementById('blood1').reset();
+            $('#commentModal').modal('hide');
+
+            var newOption = document.createElement("option");
+
+            // Set the value and text for the new option
+            newOption.value = result.blood;
+            newOption.text = result.blood;
+
+            // Add the new option to the select dropdown
+            document.getElementById("blood").appendChild(newOption);
+            
+            // Clear the error message
+            document.getElementById('bloodValidationMsg').textContent = '';
+        }
+    }
+
+    function validateAndUploadBlood() {
+        var bloodInput = document.getElementById('blood_form').value.toUpperCase();
+        var validBloodGroups = ['A-', 'A+', 'B-', 'B+', 'AB-', 'AB+', 'O-', 'O+'];
+        var isValid = validBloodGroups.includes(bloodInput);
+        var validationMsg = document.getElementById('bloodValidationMsg');
+
+        if (isValid) {
+            // Blood group is valid, proceed with submission
+            uploadBlood();
+        } else {
+            // Display validation error message
+            validationMsg.textContent = 'Invalid blood group. Please enter a valid blood group.';
+        }
+    }
+
+    function validateBloodInput() {
+        // Clear the error message when the user starts typing
+        document.getElementById('bloodValidationMsg').textContent = '';
+    }
+</script>
+    <script>
+        function validateform() {
+            var sal = document.getElementById('sal').value;
+            var amnthr = document.getElementById('amnthr').value;
+            var hours = document.getElementById('hours').value;
+            var fsalary = document.getElementById('fsalary').value;
+    
+            var dropId = document.getElementById('dropId').value;
+            var acc_no = document.getElementById('acc_no').value;
+            var ifsc = document.getElementById('ifsc').value;
+            var b_name = document.getElementById('b_name').value;
+            var branch = document.getElementById('branch').value;
+            var ttype = document.getElementById('ttype').value;
+    
+            var tds = document.getElementById('tds').value;
+            var pora = document.getElementById('pora').value;
+            var pcnt = document.getElementById('pcnt').value;
+            var amnt = document.getElementById('amnt').value;
+    
+            if (sal === 'Variable'){
+                if (amnthr === ''){
+                    alert('Add Amount per Hour');
+                    return false;
+                }
+                if (hours === ''){
+                    alert('Add Total Amount Worked');
+                    return false;
+                }
+            }else{
+                if (fsalary === ''){
+                    alert('Add Salary');
+                    return false;
+                }
+            }
+    
+            if (dropId === '1'){
+                if (acc_no === ''){
+                    alert('Add an Account Number');
+                    return false;
+                }
+                if (ifsc === ''){
+                    alert('Add IFSC code');
+                    return false;
+                }
+                if (b_name === ''){
+                    alert('Add Bank Name');
+                    return false;
+                }
+                if (branch === ''){
+                    alert('Add Branch Name');
+                    return false;
+                }
+                if (ttype === ''){
+                    alert('Select a Transaction Type');
+                    return false;
+                }
+            }
+    
+            if (tds === '1'){
+                if (pora === ''){
+                    alert('Select TDS Amount Type');
+                    return false;
+                }else if(pora === 'Percentage'){
+                    if (pcnt === ''){
+                        alert('Add Percentage of TDS');
+                        return false;
+                    }
+                }else if(pora === 'Amount'){
+                    if (amnt === ''){
+                        alert('Add TDS Amount');
+                        return false;
+                    }
+                }
+            }
+    
+            return true; 
+        }
+    </script>
+    
+    <script>
+        const input = document.getElementById("an");
+        input.addEventListener("input", () => input.value = formatNumber(input.value.replaceAll(" ", "")));
+        const formatNumber = (number) => number.split("").reduce((seed, next, index) => {
+            if (index !== 0 && !(index % 4)) seed += " ";
+            return seed + next;
+        }, "");
+    </script>
+    
+    <script>
+        var loadFile = function (event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('img');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        };
+    </script>
+    
+    <script>
+        function goToTop() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+        }
+    
+        function bankdisplay() {
+            var e = document.getElementById("dropId").value;
+            if (e == 0) {
+                document.getElementById("bank").style.display = 'none'
+                document.getElementById("acc_no").value = ''
+                document.getElementById("ifsc").value = ''
+                document.getElementById("b_name").value = ''
+                document.getElementById("branch").value = ''
+                document.getElementById("ttype").value = ''
+            }
+            else {
+                document.getElementById("bank").style.display = 'block'
+            }
+        }
+    
+        function salFunction() {
+            var e = document.getElementById("sal");
+            var sal = e.value;
+            if (sal == 'Fixed' || sal == 'Temporary') {
+                document.getElementById("fixed").style.display = 'block'
+                document.getElementById("variable").style.display = 'none'
+                document.getElementById("amnthr").value = 0
+                document.getElementById("hours").value = 0
+                document.getElementById("vsalary").value = 0
+            }
+            else if (sal == 'Variable') {
+                document.getElementById("variable").style.display = 'block'
+                document.getElementById("fixed").style.display = 'none'
+                document.getElementById("fsalary").value = 0
+            }
+        }
+    
+        function calculateAmount() {
+            var a = document.getElementById("amnthr").value;
+            var h = document.getElementById("hours").value;
+            var tot = h * a;
+            document.getElementById('vsalary').value = tot;
+        }
+    
+        function tdsFunction() {
+            var e = document.getElementById("tds");
+            var sal = e.value;
+            if (sal == '1') {
+                document.getElementById("tds-div").style.display = 'block'
+            }
+            else {
+                document.getElementById("tds-div").style.display = 'none'
+                document.getElementById("pora").value = 0
+                document.getElementById("pcnt").value = 0
+                document.getElementById("amnt").value = 0
+            }
+        }
+    
+        function tdsFunction2() {
+            var e = document.getElementById("pora");
+            var sal = e.value;
+            if (sal == 'Percentage') {
+                document.getElementById("p").style.display = 'block';
+                document.getElementById("a").style.display = 'none';
+                document.getElementById("amnt").value = 0
+            }
+            else if (sal == 'Amount') {
+                document.getElementById("a").style.display = 'block';
+                document.getElementById("p").style.display = 'none'
+                document.getElementById("pcnt").value = 0
+            }
+        }
+    
+        function emailvalidate() {
+    var email = document.getElementById('email2');
+    var error = document.getElementById('error');
+
+    // Regular expression for basic email validation
+    if (!email.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+        error.style.fontSize = ".8rem";
+        error.innerHTML = "*Please enter a valid email";
+        return false;
+    }
+
+    // Clear the error message if the email is valid
+    error.innerHTML = "";
+    return true;
+}
+
+    
+        function phoneValidate(phn, pherror) {
+            if (!phn.value.match(/^[6-9]\d{9}$/)) {
+                pherror.style.display = "block"
+                pherror.style.fontSize = ".8rem"
+                pherror.innerHTML = "*Please enter a valid phone number"
+                return false;
+            }
+            pherror.style.display = "none"
+            pherror.innerHTML = ""
+            return true;
+        }
+    
+        function empValidation(emp) {
+            emp.addEventListener("input", function () {
+                emp.value = emp.value.toUpperCase();
+            });
+        }
+    
+        inputvalue = document.getElementById('ifsc')
+        inputvalue.addEventListener("input", function () {
+            inputvalue.value = inputvalue.value.toUpperCase();
+        });
+        const inputFields = document.querySelectorAll("input[type='text']");
+        inputFields.forEach(function (input) {
+            input.addEventListener("input", function () {
+                const inputValue = input.value;
+                input.value = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+            });
+        });
+    
+        document.getElementById("an").addEventListener("input", function () {
+            const input = this.value;
+            if (input.length > 14) {
+                this.value = input.slice(0, 14);
+            }
+        });
+    
+        document.getElementById("acc_no").addEventListener("input", function () {
+            const input = this.value;
+            if (input.length > 15) {
+                this.value = input.slice(0, 15);
+            }
+        });
+    
+        $(document).ready(function () {
+            $("#filladdress").on("click", function () {
+                if (this.checked) {
+                    $("#adrs1").val($("#padrs1").val());
+                    $("#adrs2").val($("#padrs2").val());
+                }
+                else {
+                    $("#adrs1").val('');
+                    $("#adrs2").val('');
+                }
+            });
+        });
+    
+        function calculateAge() {
+            const dobInput = document.getElementById("dob");
+            const selectedDateOfBirth = new Date(dobInput.value);
+            const currentDate = new Date();
+            const age = currentDate.getFullYear() - selectedDateOfBirth.getFullYear();
+            const ageInput = document.getElementById("age");
+            ageInput.value = age;
+        }
+        function clearaddreass(id){
+            document.getElementById('filladdress').checked = false
+            if(id == 'padrs1' || id == 'padrs2'){
+                $("#adrs1").val('');
+                $("#adrs2").val('');
+            }
+        }
+    </script>
+    
+
+</div>
+</div>
+
+
+
+<script>
+// Function to make the alert blink
+function blink() {
+    $('#alertMessage').fadeOut(1000).fadeIn(1000, blink);
+}
+
+// Call the blink function when the page loads
+$(document).ready(function() {
+    blink();
+});
+</script>
+
+<script>
+$(document).on("click", "#durationsave", function () {
+    var days = $("#lday").val();
+    var durs = $("#ldur").val();
+
+    if (days != 1) {
+        durs = (durs == 'Month') ? 'Months' : 'Years';
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'create_loan_duration' %}",
+        data: {
+            days: days,
+            durs: durs,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (response) {
+            document.getElementById("durationform").reset();
+            
+            // Debug: Log the response to the console
+            console.log("Save successful. Response:", response);
+
+            // Trigger the reload immediately after a successful save
+            reload_duration();
+        },
+        error: function (xhr, status, error) {
+            // Debug: Log errors to the console
+            console.error(xhr.responseText);
+        }
+    });
+});
+
+function reload_duration() {
+    $.ajax({
+          url: "{% url 'loan_duration' %}",
+          type: "GET",
+          dataType: "json",
+          data: $(this).serialize(),
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+        
+          success: function(data) {
+            var dropdown = $('#loan_duration');
+      
+            $.each(data, function(key, value) {
+         
+                dropdown.append($('<option></option>').attr('value', key).text(value[1]).val(key));
+      
+            });
+      
+          },
+       
+        });
+        }
+
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  // Display Django messages as alerts
+  {% if messages %}
+      {% for message in messages %}
+          alert("{{ message }}");
+      {% endfor %}
+  {% endif %}
+</script>
+{% endblock %}

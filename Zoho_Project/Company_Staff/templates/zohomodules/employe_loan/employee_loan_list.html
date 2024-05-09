@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+
+<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<div class="body-wrapper">
+  <div class="container-fluid">
+      <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+            {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+             <li class="breadcrumb-item"><a href="" class="text-warning-emphasis">Employee loan</a></li>
+             
+          </ol>
+      </nav>
+      <div class="row mt-5">
+          <div class="col-md-12 col-sm-12 col-lg-12 flex-column">
+              <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1200px;">
+                <br><br>
+                <div class="col-7 col-sm-7 col-lg-7"><a class="text-white" style="font-size: 2rem;"> All Employee Loans</a></div>
+                <br>
+                <br>
+                <div class="row mt-4">
+                 
+                  
+
+
+
+
+                  <div class="row">
+                    <div class="col-md-3 "><input type="text" id="search" class="form-control text-dark" placeholder="Search.." autocomplete="off" style="border-color: rgb(198, 134, 16);background-color: antiquewhite;">
+                    </div>
+                    <div class="col-md-2">
+                      <div class="dropdown">
+                          <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+                              aria-haspopup="true" aria-expanded="false" role="button" style="margin-left: 10px;">
+                              <i class="fas fa-sort m-1"></i>
+                          </a>
+                          <div class="dropdown-menu m-1" >
+                            <a class="dropdown-item"  onclick="sortTable('All')">All</a>
+                            <a class="dropdown-item" onclick="sortTable('EmployeeName')" >Employee Name </a>
+                            <a class="dropdown-item"  onclick="sortTable('BalanceAmount')" >Employee Salary</a>
+                          
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4"></div>
+                  <div class="col-md-3">
+                      <div class="d-flex justify-content-end">
+                          <div class="dropdown">
+                              <a class="btn text-center px-4 pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+                                  aria-expanded="false" role="button">
+                                  <i class="fa fa-filter mt-1"></i>
+                              </a>
+                              <div class="dropdown-menu m-1">
+                                <a class="dropdown-item" onclick="applyFilter('All')">All</a>
+                                <a class="dropdown-item" onclick="applyFilter('Active')">Active</a>
+                                <a class="dropdown-item" onclick="applyFilter('Inactive')">Inactive</a>
+                              </div>
+                          </div>
+                
+                          <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;margin-left: 10px;"data-toggle="modal" data-target="#importModal" class="btn text-center pt-2 btn-outline-warning" onclick="sampleexcel()">
+                            <i class="fas fa-file-import" style="font-size: large;"></i>
+                            <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Import</span>
+                        </a>
+                        <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;margin-left: 10px;"onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning "  >
+                          <i class="fas fa-file-export" style="font-size: large;"></i>
+                          <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+                      </a>
+          
+                          <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center; margin-left: 10px;" class="btn btn-outline-warning"  href="{%url 'employeeloan_create' %}">
+                             
+                              <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center"> NEW</span>&nbsp;
+                              <i class="fa fa-plus" style="font-size: large;"></i>
+                          </a>
+                      </div>
+                  </div>
+
+                    
+                  
+        <br>
+        <br>
+        <div class="row mt-5"></div>
+        <div class="row mt-2">
+         
+          <div class="table-responsive">
+            <table class="table  text-white" id="employeetable" >
+              <thead>
+                <tr>
+                  <th style="text-align: center;">#</th>
+                  <th style="text-align: center;">LOAN DATE</th>
+                  <th style="text-align: center;">EMPLOYEE NAME</th>
+                  <th style="text-align: center;">EMPLOYEE NUMBER</th>
+                  <th style="text-align: center;">EMAIL ID</th>
+                  <th style="text-align: center;">EXPIRY DATE</th>
+                  <th style="text-align: center;">LOAN AMOUNT</th>
+                  <th style="text-align: center;">BALANCE</th>
+                  <th style="text-align: center;">STATUS</th>
+                </tr>
+              </thead>
+              <tbody >
+                {% for i in emp %}
+               
+
+              
+               
+            
+                  <tr id="over" class='clickable-row' data-href="{% url 'employeeloan_details' i.id %}" >
+                    <td style="text-align: center;">{{forloop.counter}}</td>
+                    <td style="text-align: center;">{{i.Loandate | date:'d-m-Y'}}</td>
+                     
+                    <td style="text-align: center;">{{i.Employee.first_name}} {{i.Employee.last_name}}</td>
+                    
+                    <td style="text-align: center;">{{i.Employee.emp_number }}</td>
+                    <td style="text-align: center;">{{i.Employee.email}}</td>
+                    <td style="text-align: center;">{{i.Expiry_date  | date:'d-m-Y'}}</td>
+                    <td style="text-align: center;">{{i.LoanAmount}}</td>   
+                    <td style="text-align: center;">{{i.balance}}</td>
+
+                    {% if i.active == 1 %}
+                    <td style="text-align: center;">Active</td>
+                    {% else %}
+                    <td style="text-align: center;">Inactive</td>
+                    {% endif %}
+                  </tr>
+                 
+              
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row" hidden>
+          <table id="employeeloanmodeltable">
+            <thead>
+              <th>EMP NUMBER</th>
+              <th>LOAN AMOUNT</th>
+              <th>LOAN ISSUE DATE</th>
+              <th>LOAN DURATION</th>
+              <th>LOAN EXPIRY DATE</th>
+              <th>PAYMENT METHOD</th>
+              <th>CHEQUE NO</th>
+              <th>UPI ID</th>
+              <th>Bank NO</th>
+              <th>MONTHLY CUTTING Type</th>
+              <th>MONTHLY CUTTING PERCENTAGE</th>
+              <th>MONTHLY CUTTING AMOUNT</th>
+              <th>NOTE</th>
+              
+            </thead>
+            <tbody>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>Ex: 1 Year</td>
+              <td></td>
+              <td>Cash/UPI/Cheque/Bank Name</td>
+              <td>Cheque NO</td>
+              <td>UPI NO</td>
+              <td>Bank Account NO</td>
+              <td>Yes/No</td>
+              <td> Percentage</td>
+              <td></td>
+              <td></td>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content bg-dark">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="importModalLabel" style="color: white;">Import Data</h5>
+                  
+              </div>
+              <div class="modal-body">
+                <p class="text-white">* All fields are mandatory except for "chequeid," "upiid," and "bankno." Please ensure that you provide information for the required fields.</p>
+                <p class="text-white">* Only employees from this company are eligible to take a loan. Verify that the data being imported pertains exclusively to employees within the designated company.</p>
+                  <form id="importForm" method="post" action="{% url 'import_employee_loan_details' %}" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input type="file" name="file" id="fileInput" class="form-control-file">
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn orange-link" data-dismiss="modal">Cancel</button>
+                  <button type="submit" form="importForm" class="btn orange-link">Save</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+          $('#importLink').click(function(e) {
+              e.preventDefault(); // Prevent the default link behavior
+              
+              // Trigger click event on the file input field
+              $('#fileInput').click();
+          });
+      
+          $('#fileInput').change(function() {
+              var file = $(this)[0].files[0];
+              uploadFile(file);
+          });
+      
+         
+      });
+      </script>
+
+  
+  <script>
+    function sortTable(option) {
+       var table, rows, switching, i, x, y, shouldSwitch;
+       table = document.getElementById("employeetable");
+       switching = true;
+ 
+       while (switching) {
+          switching = false;
+          rows = table.rows;
+ 
+          for (i = 1; i < rows.length - 1; i++) {
+             shouldSwitch = false;
+             x = rows[i].getElementsByTagName("td")[2]; // Modify index based on the column you want to sort
+             y = rows[i + 1].getElementsByTagName("td")[2]; // Modify index based on the column you want to sort
+ 
+             if (option === 'EmployeeName') {
+                shouldSwitch = x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase();
+             } else if (option === 'BalanceAmount') {
+                shouldSwitch = parseFloat(rows[i].getElementsByTagName("td")[7].innerHTML) > parseFloat(rows[i + 1].getElementsByTagName("td")[7].innerHTML);
+             }
+ 
+             if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+             }
+          }
+       }
+    }
+ </script>
+ 
+
+
+<script>
+  jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+      window.location = $(this).data("href");
+    });
+  });
+</script>
+
+<script>
+  var $rows = $('table tbody tr');
+  $('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    $rows.hide().filter(function() {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+</script>
+
+<script>
+  function applyFilter(currentFilter) {
+    var rows = $("#employeetable tbody tr");
+    rows.show();
+    if (currentFilter === "Active" || currentFilter === "Inactive") {
+      rows.filter(":not(:contains('" + currentFilter + "'))").hide();
+    }
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script>
+  function ExportToExcel() {
+    console.log("employeetable");
+    $('in1').prop
+    const table = document.getElementById('employeetable'); // Replace 'myTable' with your table's ID
+    const wb = XLSX.utils.table_to_book(table);
+
+    XLSX.writeFile(wb, 'employeeloan_list.xlsx');
+}
+</script>
+
+<script>
+  function sampleexcel(){
+    const table1 = document.querySelector('#employeeloanmodeltable');
+    const ws1 = XLSX.utils.table_to_sheet(table1);
+    const wb1 = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+    XLSX.writeFile(wb1, 'EmployeLoanModel.xlsx');
+  }
+</script>
+
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  // Display Django messages as alerts
+  {% if messages %}
+      {% for message in messages %}
+          alert("{{ message }}");
+      {% endfor %}
+  {% endif %}
+</script>
+<script>
+  function uploadFile() {
+    const form = document.getElementById('excelForm');
+    const formData = new FormData(form);
+    fetch('import_employee_loan_details', {
+      method: 'POST',
+      body: formData
+    })
+    .then(data => {
+            swal({
+                title: "Imported !",
+                text: "Purchase Bill Import Successfull!",
+                icon: "success",
+                buttons: false,
+            })
+        })
+        .then(response => {
+            setTimeout(function () {
+                location.reload();
+            }, 1250);
+        })
+        .catch(error => {
+            swal({
+                title: "Error !",
+                text: "Purchase Bill Import Unuccessfull!",
+                icon: "warning",
+                buttons: false,
+            })
+        });
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous">
+</script>
+{% endblock %}

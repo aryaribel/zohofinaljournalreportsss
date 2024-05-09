@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debitnote</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+   
+    <style>
+        .table2 {
+            text-align: center;
+            padding-top: 6px;
+            font-size: 1.1em;
+            background-color: rgb(221, 247, 247);
+
+        }
+
+        .table-head {
+            color: rgb(52, 49, 58);
+        }
+
+        .table2 .tbody tr {
+            margin-bottom: 3px;
+        }
+
+        .table3 {
+            width: 75px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        body {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view ribbon text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4 ribbon-inner ribbon-open" style="
+                margin-right: 600px;
+                color: white;
+                text-align: center;
+                padding-top: 10px;
+              ">
+                </div>
+                <div class="col-md-4">
+                    <h3>
+                        <center class="text-black"><b>Employee Loan Statement</b></center>
+                    </h3>
+                </div>
+                <div class="col-md-4 graphic-path" style="
+                  text-align: right;
+                  padding-top: 10px;
+                  margin-left: 550px;
+                  text-align: center;
+                  color: rgb(0, 0, 0);
+                ">
+                    <!-- <p>Employee No. <span style="font-weight: bold;">{{p.Employee.emp_number }}</span> -->
+                        <br>
+                       
+                       
+                    </p>
+
+                </div>
+            </div>
+            <br><br>
+
+            <table class="table1 table-bordered" style="border-color: black;">
+                <tbody>
+                    <tr style="font-weight: bolder">
+                        <td></td>
+                        <td></td>
+                        <td>TO</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if log_details.user_type == 'Company' %}
+                            <h5 style=" text-transform: uppercase;color: #000000;">{{details.company_name }}</h5>
+                            <p style=" text-transform: uppercase;color: #000000;" > {{details.address}}<br>
+                                {{details.city}},
+                                {{details.state}}<br>
+                                {{details.pincode}}<br>
+                                {{details.country}}<br>
+                            </p>
+                            
+                     
+                        {%endif%}
+                        {% if log_details.user_type == 'Staff' %}
+                        <h5 style=" text-transform: uppercase;color: #000000;">{{details.company.company_name }}</h5>
+                          <p style=" text-transform: uppercase;color: #000000;" > {{details.company.address}}<br>
+                              {{details.company.city}},
+                              {{details.company.state}}<br>
+                              {{details.company.pincode}}<br>
+                              {{details.company.country}}<br>
+                          </p>
+                          {%endif%}
+                        </td>
+                        <td></td>
+                        <td>
+                            <h5 class="text-info" style="font-weight: bold;"><span style="color: #000;">
+                                </span>{{p.Employee.first_name}}
+                                {{p.Employee.last_name}}</h5>
+                            <p class="address" style="font-weight: bold;color: #000;">
+                                {{p.Employee.location}}<br>
+                                {{p.Employee.address }}<br>
+                                {{p.Employee.email}}
+                                <br>
+                                {{p.Employee.Phone}}<br>
+       
+                               
+                                
+                           
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr /><br>
+            <table class="table1 table-bordered" style="border-color: black;">
+                <tbody>
+                    <tr style="font-weight: bolder">
+                        <td> Balance</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                           
+                            <h5 style=" text-transform: uppercase;color: #000000;">{{last_loan }}</h5>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <!-- <h5 style=" text-transform: uppercase;color: #000000;">{{p.balance }}</h5> -->
+                            </td>
+
+                 </tr>           
+            
+                 </tbody>
+            
+            </table>
+            <section class="product-area mt-4">
+                <table class="table2 table-hover table-primary">
+                    <thead>
+                        <tr>
+                            <td>Sl.No</td>
+                            <td>Loan Date</td>
+                            <td>Particular</td>
+                            <td>Amount</td>
+                            <td>Intrest</td>
+                            <td>Total Amount</td>
+                            <td>Balance</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      
+                        {% for i in loan_trans %}
+                                                                    <tr>
+                                                                        <td class="text-center" style="color: black;">{{forloop.counter}}</td>
+                                                                        <td class="text-center" style="color: black;">{{i.payment_date | date:'d-m-Y'}}</td>
+                                                                        <td class="text-center" style="color: black;">{{i.particular}}</td>
+                                                                        <td class="text-center" style="color:black">{{i.principal_amount}}</td>
+                                                                        
+                                                                        <td class="text-center" style="color: black;">{{i.interest_amonut}}</td>
+                                                                       
+                                                                        <td class="text-center" style="color:black">{{i.total_payment}}</td>
+                                                                        <td class="text-center" style="color:black">{{ i.balance }}</td>
+                                                                    </tr>
+                                                                {% endfor %} 
+                    </tbody>
+                </table>
+            </section>
+        
+          
+        </div>
+    </div>
+</body>
+
+</html>
